@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../../constants.dart';
 
@@ -10,12 +10,12 @@ class ScanResultTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   Widget _buildTitle(BuildContext context) {
-    if (result.device.name.isNotEmpty) {
+    if (result.device.platformName.isNotEmpty) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          result.device.name.contains('DSD')
+          result.device.platformName.contains('DSD')
               ? Text(
                   'Exoskelett',
                   style: TextStyle(
@@ -24,17 +24,17 @@ class ScanResultTile extends StatelessWidget {
                   ),
                 )
               : Text(
-                  result.device.name,
+                  result.device.platformName,
                   overflow: TextOverflow.ellipsis,
                 ),
           Text(
-            result.device.id.toString(),
+            result.device.remoteId.toString(),
             style: Theme.of(context).textTheme.bodySmall,
           )
         ],
       );
     } else {
-      return Text(result.device.id.toString());
+      return Text(result.device.remoteId.toString());
     }
   }
 
@@ -80,13 +80,13 @@ class ScanResultTile extends StatelessWidget {
     return res.join(', ');
   }
 
-  String getNiceServiceData(Map<String, List<int>> data) {
+  String getNiceServiceData(Map<Guid, List<int>> data) {
     if (data.isEmpty) {
       return 'N/A';
     }
     List<String> res = [];
     data.forEach((id, bytes) {
-      res.add('${id.toUpperCase()}: ${getNiceHexArray(bytes)}');
+      res.add('$id: ${getNiceHexArray(bytes)}');
     });
     return res.join(', ');
   }
@@ -130,7 +130,7 @@ class ScanResultTile extends StatelessWidget {
       ),
       children: <Widget>[
         _buildAdvRow(
-            context, 'Complete Local Name', result.advertisementData.localName),
+            context, 'Complete Local Name', result.advertisementData.advName),
         _buildAdvRow(context, 'Tx Power Level',
             '${result.advertisementData.txPowerLevel ?? 'N/A'}'),
         _buildAdvRow(context, 'Manufacturer Data',
@@ -199,7 +199,7 @@ class CharacteristicTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
-      stream: characteristic.value,
+      stream: characteristic.lastValueStream,
       initialData: characteristic.lastValue,
       builder: (c, snapshot) {
         final value = snapshot.data;
@@ -276,7 +276,7 @@ class DescriptorTile extends StatelessWidget {
         ],
       ),
       subtitle: StreamBuilder<List<int>>(
-        stream: descriptor.value,
+        stream: descriptor.onValueReceived,
         initialData: descriptor.lastValue,
         builder: (c, snapshot) => Text(snapshot.data.toString()),
       ),
@@ -306,7 +306,7 @@ class DescriptorTile extends StatelessWidget {
 class AdapterStateTile extends StatelessWidget {
   const AdapterStateTile({super.key, required this.state});
 
-  final BluetoothState state;
+  final BluetoothAdapterState state;
 
   @override
   Widget build(BuildContext context) {

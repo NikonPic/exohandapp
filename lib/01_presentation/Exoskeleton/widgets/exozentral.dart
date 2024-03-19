@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../../../02_application/exo_catch.dart';
 import '../../../02_application/exoskeleton.dart';
 import '../../../02_application/exoskeletongame.dart';
@@ -80,6 +80,37 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
     return [ms, angleB, angleA, angleK, forceB, forceA];
   }
 
+  List<int> allSensorDataBig(List<String> returnData) {
+    // index finger
+    int angleNI = getSensorData(returnData[0], returnData[1]);
+    int angleBI = getSensorData(returnData[2], returnData[3]);
+    int angleAI = getSensorData(returnData[4], returnData[5]);
+    int angleKI = getSensorData(returnData[6], returnData[7]);
+    // middle finger
+    int angleNM = getSensorData(returnData[8], returnData[9]);
+    int angleBM = getSensorData(returnData[10], returnData[11]);
+    int angleAM = getSensorData(returnData[12], returnData[13]);
+    int angleKM = getSensorData(returnData[14], returnData[15]);
+    // ring finger
+    int angleNR = getSensorData(returnData[16], returnData[17]);
+    int angleBR = getSensorData(returnData[18], returnData[19]);
+    int angleAR = getSensorData(returnData[20], returnData[21]);
+    int angleKR = getSensorData(returnData[22], returnData[23]);
+    // small finger
+    int angleNS = getSensorData(returnData[24], returnData[25]);
+    int angleBS = getSensorData(returnData[26], returnData[27]);
+    int angleAS = getSensorData(returnData[28], returnData[29]);
+    int angleKS = getSensorData(returnData[30], returnData[31]);
+    //forces
+    int forceI = getSensorData(returnData[32], returnData[33]);
+    int forceM = getSensorData(returnData[34], returnData[35]);
+    int forceR = getSensorData(returnData[36], returnData[37]);
+    int forceS = getSensorData(returnData[38], returnData[39]);
+    //centiseconds
+    int cs = getSensorData(returnData[40], returnData[41]);
+    return [cs, angleBI, angleAI, angleKI, forceI, forceS];
+  }
+
   int getSensorData(String byte0, String byte1) {
     // transform to binary string and add running 0.
     String myLocString0 = (int.parse(byte0)).toRadixString(2).padLeft(8, '0');
@@ -94,17 +125,18 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
     // transform to binary string and add running 0.
     myLocString = (int.parse(byte0)).toRadixString(2).padLeft(8, '0');
     // first 3 eles of binary to sensID
-    int _sensor = int.parse(myLocString.substring(0, 3), radix: 2);
+    int sensor = int.parse(myLocString.substring(0, 3), radix: 2);
 
-    return _sensor;
+    return sensor;
   }
 
   void addNewSnapData(AsyncSnapshot<List<int>> snapshot) async {
     final List<String> returnData = getCleanString(snapshot);
-    if (returnData.length == 12) {
-      final List<int> message = allSensorData(returnData);
-      double msNew = message[0].toDouble();
-      int hzInt = (1000 / max(msNew - msOld, 1.0)).ceil();
+
+    if (returnData.length == 80) {
+      final List<int> message = allSensorDataBig(returnData);
+      double msNew = message.last.toDouble();
+      int hzInt = (100 / max(msNew - msOld, 1.0)).ceil();
       trace.add(hzInt);
       int sum = trace.fold(0, (p, c) => p + c);
       int avHz = (sum / trace.length).ceil().toInt();
@@ -129,7 +161,7 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
         isLoading
             ? const CircularProgressIndicator()
             : StreamBuilder<List<int>>(
-                stream: myChars[1].value,
+                stream: myChars[1].lastValueStream,
                 builder:
                     (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
                   addNewSnapData(snapshot);
@@ -320,16 +352,13 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
 Future<void> _writeText(BluetoothCharacteristic characteristic,
     BuildContext context, String text) async {
   try {
-    await characteristic.write(utf8.encode(text), withoutResponse: true);
+    await characteristic.write(utf8.encode(text));
     await Future.delayed(const Duration(milliseconds: 100));
-    await characteristic.write(utf8.encode('$text$text'),
-        withoutResponse: true);
+    await characteristic.write(utf8.encode('$text$text'));
     await Future.delayed(const Duration(milliseconds: 100));
-    await characteristic.write(utf8.encode('$text$text$text'),
-        withoutResponse: true);
+    await characteristic.write(utf8.encode('$text$text$text'));
     await Future.delayed(const Duration(milliseconds: 100));
-    await characteristic.write(utf8.encode('$text$text$text$text'),
-        withoutResponse: true);
+    await characteristic.write(utf8.encode('$text$text$text$text'));
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -98,11 +98,11 @@ class GlassMorphism extends StatelessWidget {
   final double start;
   final double end;
   const GlassMorphism({
-    Key? key,
+    super.key,
     required this.child,
     required this.start,
     required this.end,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

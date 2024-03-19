@@ -11,8 +11,7 @@ import '../Exoskeleton/widgets/exoview.dart';
 
 class MeasurementDetailPage extends StatefulWidget {
   const MeasurementDetailPage(
-      {Key? key, required this.readFileName, required this.name})
-      : super(key: key);
+      {super.key, required this.readFileName, required this.name});
   final String readFileName;
   final String name;
 

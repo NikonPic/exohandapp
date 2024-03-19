@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import '../../constants.dart';
 import '../Exoskeleton/exoscreen.dart';
@@ -15,14 +15,13 @@ class DeviceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildDeviceAppBar(context),
-      body: StreamBuilder<BluetoothDeviceState>(
-        stream: device.state,
-        initialData: BluetoothDeviceState.connecting,
+      body: StreamBuilder<BluetoothConnectionState>(
+        stream: device.connectionState,
         builder: (BuildContext context,
-            AsyncSnapshot<BluetoothDeviceState> snapshot) {
+            AsyncSnapshot<BluetoothConnectionState> snapshot) {
           Widget myWidget;
           switch (snapshot.data) {
-            case BluetoothDeviceState.connected:
+            case BluetoothConnectionState.connected:
               myWidget = FutureBuilder(
                 future: getChars(device),
                 builder: (BuildContext context,
@@ -32,38 +31,6 @@ class DeviceScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           const SizedBox(height: 20),
-                          /*
-                          MyStyleButton(
-                            myFunc: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => CalibrationScreen(
-                                            myChar: charSnapshot.data!,
-                                            myDevice: device,
-                                            name: name,
-                                          )),
-                                  (route) => false);
-                            },
-                            text: 'Perform Calibration',
-                          ),
-                          SizedBox(height: 20),
-                          MyStyleButton(
-                            myFunc: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MyOsciScreen(
-                                            myChar: charSnapshot.data!,
-                                            myDevice: device,
-                                            name: name,
-                                          )),
-                                  (route) => false);
-                            },
-                            text: 'View Sensor Details',
-                          ),
-                          SizedBox(height: 20),
-                          */
                           MyStyleButton(
                             myFunc: () {
                               Navigator.pushAndRemoveUntil(
@@ -102,17 +69,16 @@ class DeviceScreen extends StatelessWidget {
   AppBar buildDeviceAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: kPrimaryColor,
-      title: Text(device.name),
+      title: Text(device.platformName),
       actions: <Widget>[
-        StreamBuilder<BluetoothDeviceState>(
-          stream: device.state,
-          initialData: BluetoothDeviceState.connecting,
+        StreamBuilder<BluetoothConnectionState>(
+          stream: device.connectionState,
           builder: (c, snapshot) {
             VoidCallback? onPressed;
             String text;
             Icon myIcon;
             switch (snapshot.data) {
-              case BluetoothDeviceState.connected:
+              case BluetoothConnectionState.connected:
                 onPressed = () => device.disconnect();
                 text = 'DISCONNECT';
                 myIcon = const Icon(
@@ -120,7 +86,7 @@ class DeviceScreen extends StatelessWidget {
                   color: Colors.green,
                 );
                 break;
-              case BluetoothDeviceState.disconnected:
+              case BluetoothConnectionState.disconnected:
                 onPressed =
                     () => device.connect().timeout(const Duration(seconds: 4));
                 text = 'CONNECT';

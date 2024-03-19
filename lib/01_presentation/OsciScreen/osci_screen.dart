@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:oscilloscope/oscilloscope.dart';
 
 import '../../constants.dart';
@@ -19,11 +18,10 @@ class MyOsciScreen extends StatelessWidget {
   static String routeName = "/my_osci_screen";
 
   const MyOsciScreen(
-      {Key? key,
+      {super.key,
       required this.myChar,
       required this.myDevice,
-      required this.name})
-      : super(key: key);
+      required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +32,7 @@ class MyOsciScreen extends StatelessWidget {
         backgroundColor: kPrimaryColor,
         title: Row(children: [
           InkWell(
-            child: Icon(Icons.arrow_back),
+            child: const Icon(Icons.arrow_back),
             onTap: () async {
               await myDevice.disconnect();
               Navigator.pushAndRemoveUntil(
@@ -47,23 +45,23 @@ class MyOsciScreen extends StatelessWidget {
                   (route) => false);
             },
           ),
-          Spacer(),
-          Text('Sensor Data'),
-          Spacer(),
+          const Spacer(),
+          const Text('Sensor Data'),
+          const Spacer(),
           InkWell(
-            child: Icon(Icons.info),
+            child: const Icon(Icons.info),
             onTap: () async {
               showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                  title: Text(
+                  title: const Text(
                       'Press Start and review all 5 Sensors of this system.'),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text('Close'),
+                      child: const Text('Close'),
                     )
                   ],
                 ),
@@ -75,7 +73,7 @@ class MyOsciScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Stack(
@@ -86,7 +84,7 @@ class MyOsciScreen extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     MyStyleButton(
                       myFunc: () async {
                         await _writeText(myChar, context, 'Start');
@@ -102,7 +100,7 @@ class MyOsciScreen extends StatelessWidget {
                       },
                       text: 'Stop',
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ],
@@ -112,7 +110,7 @@ class MyOsciScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimaryColor,
-        child: Icon(Icons.refresh),
+        child: const Icon(Icons.refresh),
         onPressed: () => Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -124,18 +122,18 @@ class MyOsciScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _writeText(BluetoothCharacteristic _characteristic,
+  Future<void> _writeText(BluetoothCharacteristic characteristic,
       BuildContext context, String text) async {
     try {
-      await _characteristic.write(utf8.encode(text), withoutResponse: true);
+      await characteristic.write(utf8.encode(text), withoutResponse: true);
       await Future.delayed(const Duration(milliseconds: 100));
-      await _characteristic.write(utf8.encode('$text$text'),
+      await characteristic.write(utf8.encode('$text$text'),
           withoutResponse: true);
       await Future.delayed(const Duration(milliseconds: 100));
-      await _characteristic.write(utf8.encode('$text$text$text'),
+      await characteristic.write(utf8.encode('$text$text$text'),
           withoutResponse: true);
       await Future.delayed(const Duration(milliseconds: 100));
-      await _characteristic.write(utf8.encode('$text$text$text$text'),
+      await characteristic.write(utf8.encode('$text$text$text$text'),
           withoutResponse: true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -149,10 +147,10 @@ class MyOsciScreen extends StatelessWidget {
 
 class OscillatorSensorScreen extends StatefulWidget {
   const OscillatorSensorScreen({
-    Key? key,
+    super.key,
     required this.myChar,
     required this.select,
-  }) : super(key: key);
+  });
 
   @override
   _OscillatorSensorScreenState createState() =>
@@ -202,11 +200,11 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
   }
 
   bool checkSensorMatch(String byte0) {
-    int _sensor = getSensorIndex(byte0);
+    int sensor = getSensorIndex(byte0);
 
     // check and update sensor value
-    if (sensCount[_sensor] < _minSensLength + buffer) {
-      sensCount[_sensor] += 1;
+    if (sensCount[sensor] < _minSensLength + buffer) {
+      sensCount[sensor] += 1;
       _minSensLength = sensCount.reduce(min);
 
       if (_minSensLength == 1) {
@@ -231,9 +229,9 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
     // transform to binary string and add running 0.
     myLocString = (int.parse(byte0)).toRadixString(2).padLeft(8, '0');
     // first 3 eles of binary to sensID
-    int _sensor = int.parse(myLocString.substring(0, 3), radix: 2);
+    int sensor = int.parse(myLocString.substring(0, 3), radix: 2);
 
-    return _sensor;
+    return sensor;
   }
 
   void addNewSnapData(AsyncSnapshot<List<int>> snapshot) {
@@ -242,8 +240,8 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
     // check if package can be accepted
     if (checkNewString(myString)) {
       // add current sensor value
-      int _sensor = getSensorIndex(myString[0]);
-      trace.add(_sensor);
+      int sensor = getSensorIndex(myString[0]);
+      trace.add(sensor);
 
       // get the frequency
       hz = (_minSensLength /
@@ -258,12 +256,12 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return StreamBuilder<List<int>>(
-      stream: myChar.value,
+      stream: myChar.lastValueStream,
       builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
         addNewSnapData(snapshot);
         return Column(
           children: [
-            Container(
+            SizedBox(
               width: size.width * .45,
               child: SizedBox(
                 height: 50,
@@ -280,7 +278,7 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
               ),
             ),
             Center(child: Text('Hz: $hz')),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
           ],

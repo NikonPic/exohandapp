@@ -91,7 +91,7 @@ class HomeScreenTopBar extends StatelessWidget {
                       ),
                       onTap: () => Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => LoginWithName(),
+                            builder: (context) => const LoginWithName(),
                           ),
                           (Route<dynamic> route) => false),
                     ),

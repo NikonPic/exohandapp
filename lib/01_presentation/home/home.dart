@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
-import '../Questionnaires/QuestionScreen.dart';
+import '../Questionnaires/question_screen.dart';
 import '../UserInformation/user_information.dart';
 import '../highscores/highscore.dart';
 import 'widgets/home_screen_card.dart';

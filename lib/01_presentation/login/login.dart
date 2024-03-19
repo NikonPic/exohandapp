@@ -103,7 +103,7 @@ class _LoginWithNameState extends State<LoginWithName> {
   void goToHomePage() async {
     final String name = myController.text;
 
-    if (name.length > 0) {
+    if (name.isNotEmpty) {
       await UserDatabase.instance.readOrCreateUserByNickName(name);
       Navigator.pushReplacement(
         context,

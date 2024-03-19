@@ -1,7 +1,7 @@
 // ignore_for_file: unnecessary_new
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -29,15 +29,14 @@ class FindDevicesScreen extends StatelessWidget {
           if (snapshot.hasData) {
             if (snapshot.data == true) {
               return RefreshIndicator(
-                onRefresh: () => FlutterBlue.instance
-                    .startScan(timeout: const Duration(seconds: 4)),
+                onRefresh: () => FlutterBluePlus.startScan(
+                    timeout: const Duration(seconds: 4)),
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
                       StreamBuilder<List<BluetoothDevice>>(
                         stream: Stream.periodic(const Duration(seconds: 2))
-                            .asyncMap(
-                                (_) => FlutterBlue.instance.connectedDevices),
+                            .asyncMap((_) => FlutterBluePlus.connectedDevices),
                         initialData: const [],
                         builder: (c, snapshot) {
                           if (snapshot.hasData) {
@@ -45,15 +44,15 @@ class FindDevicesScreen extends StatelessWidget {
                               children: snapshot.data!
                                   .map((d) => ListTile(
                                         title: highLightText(d),
-                                        subtitle: Text(d.id.toString()),
-                                        trailing:
-                                            StreamBuilder<BluetoothDeviceState>(
-                                          stream: d.state,
-                                          initialData:
-                                              BluetoothDeviceState.disconnected,
+                                        subtitle: Text(d.remoteId.toString()),
+                                        trailing: StreamBuilder<
+                                            BluetoothConnectionState>(
+                                          stream: d.connectionState,
+                                          initialData: BluetoothConnectionState
+                                              .disconnected,
                                           builder: (c, snapshot) {
                                             if (snapshot.data ==
-                                                BluetoothDeviceState
+                                                BluetoothConnectionState
                                                     .connected) {
                                               return ElevatedButton(
                                                 style: ButtonStyle(
@@ -91,7 +90,7 @@ class FindDevicesScreen extends StatelessWidget {
                         },
                       ),
                       StreamBuilder<List<ScanResult>>(
-                        stream: FlutterBlue.instance.scanResults,
+                        stream: FlutterBluePlus.scanResults,
                         initialData: const [],
                         builder: (c, snapshot) => Column(
                           children: snapshot.data!
@@ -135,13 +134,13 @@ class FindDevicesScreen extends StatelessWidget {
   }
 
   Widget highLightText(BluetoothDevice d) {
-    if (d.name.contains('DSD')) {
+    if (d.platformName.contains('DSD')) {
       return Text(
         'Exoskelett',
         style: TextStyle(color: Colors.green.shade800, fontSize: 20),
       );
     }
-    return Text(d.name);
+    return Text(d.platformName);
   }
 
   Future<bool> _getPermissions() async {
@@ -171,12 +170,12 @@ class StreamingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-      stream: FlutterBlue.instance.isScanning,
+      stream: FlutterBluePlus.isScanning,
       initialData: false,
       builder: (c, snapshot) {
         if (snapshot.data!) {
           return FloatingActionButton(
-            onPressed: () => FlutterBlue.instance.stopScan(),
+            onPressed: () => FlutterBluePlus.stopScan(),
             backgroundColor: Colors.redAccent,
             child: const Icon(Icons.stop),
           );
@@ -186,8 +185,8 @@ class StreamingActionButton extends StatelessWidget {
               child: const Icon(
                 Icons.search,
               ),
-              onPressed: () => FlutterBlue.instance
-                  .startScan(timeout: const Duration(seconds: 4)));
+              onPressed: () => FlutterBluePlus.startScan(
+                  timeout: const Duration(seconds: 4)));
         }
       },
     );

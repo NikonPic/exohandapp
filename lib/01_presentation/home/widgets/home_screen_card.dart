@@ -143,16 +143,14 @@ class HomeScreenCard extends StatelessWidget {
 List _buildList(List<HomePageContent> myList, String name) {
   List<Widget> listItems = [];
 
-  myList.forEach(
-    (element) {
-      listItems.add(
-        HomeScreenCard(
-          element: element,
-          name: name,
-        ),
-      );
-    },
-  );
+  for (var element in myList) {
+    listItems.add(
+      HomeScreenCard(
+        element: element,
+        name: name,
+      ),
+    );
+  }
 
   return listItems;
 }

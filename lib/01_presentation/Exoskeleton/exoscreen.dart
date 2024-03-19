@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../../constants.dart';
 import '../home/home.dart';
 import 'widgets/exozentral.dart';
@@ -22,8 +21,6 @@ class ExoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    myChars[0].setNotifyValue(true);
-    myChars[1].setNotifyValue(true);
     return Scaffold(
       appBar: buildDeviceAppBar(context),
       body: SingleChildScrollView(
@@ -82,15 +79,14 @@ class ExoScreen extends StatelessWidget {
         const Spacer(),
       ]),
       actions: <Widget>[
-        StreamBuilder<BluetoothDeviceState>(
-          stream: myDevice.state,
-          initialData: BluetoothDeviceState.connecting,
+        StreamBuilder<BluetoothConnectionState>(
+          stream: myDevice.connectionState,
           builder: (c, snapshot) {
             VoidCallback? onPressed;
             String text;
             Icon myIcon;
             switch (snapshot.data) {
-              case BluetoothDeviceState.connected:
+              case BluetoothConnectionState.connected:
                 onPressed = () => myDevice.disconnect();
                 text = 'Verbunden';
                 myIcon = const Icon(
@@ -98,7 +94,7 @@ class ExoScreen extends StatelessWidget {
                   color: Colors.green,
                 );
                 break;
-              case BluetoothDeviceState.disconnected:
+              case BluetoothConnectionState.disconnected:
                 onPressed = () =>
                     myDevice.connect().timeout(const Duration(seconds: 4));
                 text = 'Nicht verbunden';
@@ -109,7 +105,7 @@ class ExoScreen extends StatelessWidget {
                 break;
               default:
                 onPressed = null;
-                text = snapshot.data.toString().substring(21).toUpperCase();
+                text = 'waiting';
                 myIcon = const Icon(
                   Icons.bluetooth_disabled,
                   color: Colors.red,

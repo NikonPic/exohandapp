@@ -17,7 +17,7 @@ class QuestionScreen extends StatelessWidget {
 
 // This class contains the quetions
 class QuestionsContainer extends StatefulWidget {
-  const QuestionsContainer({Key? key}) : super(key: key);
+  const QuestionsContainer({super.key});
 
   @override
   State<QuestionsContainer> createState() => _QuestionsContainerState();
