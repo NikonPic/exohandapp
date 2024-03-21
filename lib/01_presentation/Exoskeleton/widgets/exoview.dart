@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:oscilloscope/oscilloscope.dart';
 import '../../../02_application/exoskeleton.dart';
 
@@ -101,6 +100,14 @@ class ExoViewHand extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(
+            height: 10,
+          ),
+          ForceInfos(
+              mystroke: mystroke,
+              yAxisRange: 500,
+              myExo: myExo,
+              myfonts: myfonts)
         ],
       ),
     );
@@ -586,4 +593,141 @@ int getvalue(double value) {
     return 0;
   }
   return value.toInt();
+}
+
+class ForceInfos extends StatelessWidget {
+  const ForceInfos({
+    super.key,
+    required this.mystroke,
+    required this.yAxisRange,
+    required this.myExo,
+    required this.myfonts,
+  });
+
+  final double mystroke;
+  final double yAxisRange;
+  final ExoHand myExo;
+  final double myfonts;
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      width: size.width * 0.9,
+      decoration: BoxDecoration(
+          color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
+      height: 200,
+      child: Stack(
+        children: [
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.amber,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myExo.indexData.forceArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myExo.indexData.forceArr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.blue,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myExo.middleData.forceArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myExo.middleData.forceArr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.red,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myExo.ringData.forceArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myExo.ringData.forceArr = [],
+            showYAxis: true,
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.purple,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myExo.smallData.forceArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myExo.smallData.forceArr = [],
+            showYAxis: true,
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              const Spacer(),
+              const Spacer(),
+              const Spacer(),
+              const Spacer(),
+              const Spacer(),
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    'index: ${myExo.indexData.force} N',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w300,
+                      fontSize: myfonts,
+                      color: Colors.amber,
+                    ),
+                  ),
+                  Text(
+                    'middle: ${myExo.middleData.force} N',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: myfonts,
+                        color: Colors.blue),
+                  ),
+                  Text(
+                    'ring: ${myExo.ringData.force} N',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: myfonts,
+                        color: Colors.red),
+                  ),
+                  Text(
+                    'small: ${myExo.smallData.force} N',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: myfonts,
+                        color: Colors.purple),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Column(
+                children: [
+                  const SizedBox(height: 5),
+                  Text(
+                    '$yAxisRange [N]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${-yAxisRange} [N]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -70,6 +70,8 @@ class FingerData {
     angleK =
         (timeFilter * angleK + (1 - timeFilter) * intSubMessage[3]).toInt();
 
+    force = (timeFilter * force + (1 - timeFilter) * intSubMessage[4]).toInt();
+
     addRawArrs();
   }
 
