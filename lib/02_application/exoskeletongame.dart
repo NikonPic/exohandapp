@@ -133,7 +133,6 @@ class Friends {
     bool decision = false;
 
     if (curLen > 0) {
-      print(myCircles[0].posX);
       for (var i = 0; i < curLen; i++) {
         if (myCircles[i].update(avatarX, avatarY, avatarRadius)) {
           decision = true;
@@ -196,7 +195,6 @@ class Enemies {
     bool decision = false;
 
     if (curLen > 0) {
-      print(myBlocks[0].posX);
       for (var i = 0; i < curLen; i++) {
         if (myBlocks[i].update(avatarX, avatarY, avatarRadius)) {
           decision = true;

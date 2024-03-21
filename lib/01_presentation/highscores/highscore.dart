@@ -10,13 +10,13 @@ class HighScorePage extends StatefulWidget {
   final String name;
 
   @override
-  _HighScorePageState createState() => _HighScorePageState(name);
+  HighScorePageState createState() => HighScorePageState(name);
 }
 
-class _HighScorePageState extends State<HighScorePage> {
+class HighScorePageState extends State<HighScorePage> {
   final String name;
 
-  _HighScorePageState(this.name);
+  HighScorePageState(this.name);
 
   List<String> fileNames = [];
   bool isLoading = true;
@@ -78,7 +78,7 @@ class _HighScorePageState extends State<HighScorePage> {
                     },
                     child: Center(
                         child: Text(
-                      '${fileNames[index]}',
+                      fileNames[index],
                       style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w300,

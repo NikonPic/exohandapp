@@ -19,13 +19,13 @@ class ExoZentralScreen extends StatefulWidget {
   });
 
   @override
-  _ExoZentralScreenState createState() => _ExoZentralScreenState(myChars, name);
+  ExoZentralScreenState createState() => ExoZentralScreenState(myChars, name);
 
   final List<BluetoothCharacteristic> myChars;
   final String name;
 }
 
-class _ExoZentralScreenState extends State<ExoZentralScreen> {
+class ExoZentralScreenState extends State<ExoZentralScreen> {
   final List<BluetoothCharacteristic> myChars;
   final String name;
   bool isLoading = true;
@@ -53,11 +53,12 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
   String myLocString = '1';
   DateTime timeStart = DateTime.now();
   ExoskeletonAdv myExo = ExoskeletonAdv();
+  ExoHand myHand = ExoHand();
   ExoskeletonGame myExoGame = ExoskeletonGame();
   ExoskeletonCatch myExoCatch = ExoskeletonCatch();
   int gameSwitch = 0;
 
-  _ExoZentralScreenState(this.myChars, this.name);
+  ExoZentralScreenState(this.myChars, this.name);
 
   // Transform local snapshot to String
   List<String> getCleanString(AsyncSnapshot<List<int>> snapshot) {
@@ -108,17 +109,47 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
     int forceS = getSensorData(returnData[38], returnData[39]);
     //centiseconds
     int cs = getSensorData(returnData[40], returnData[41]);
-    return [cs, angleBI, angleAI, angleKI, forceI, forceS];
+    return [
+      cs,
+      angleNI,
+      angleBI,
+      angleAI,
+      angleKI,
+      angleNM,
+      angleBM,
+      angleAM,
+      angleKM,
+      angleNR,
+      angleBR,
+      angleAR,
+      angleKR,
+      angleNS,
+      angleBS,
+      angleAS,
+      angleKS,
+      forceI,
+      forceM,
+      forceR,
+      forceS
+    ];
   }
 
   int getSensorData(String byte0, String byte1) {
-    // transform to binary string and add running 0.
-    String myLocString0 = (int.parse(byte0)).toRadixString(2).padLeft(8, '0');
-    String myLocString1 = (int.parse(byte1)).toRadixString(2).padLeft(8, '0');
-    String combStr = myLocString0 + myLocString1;
-    int data = int.parse(combStr, radix: 2);
+    // Convert byte strings to integers
+    int b0 = int.parse(byte0);
+    int b1 = int.parse(byte1);
 
-    return data;
+    // Combine the two bytes. Assume little-endian order by default.
+    // Adjust if your system uses a different endianness.
+    int combined = b0 | (b1 << 8);
+
+    // Check if the combined integer represents a negative value
+    if ((combined & 0x8000) != 0) {
+      // If yes, convert from two's complement to negative int
+      combined = combined - 0x10000;
+    }
+
+    return combined;
   }
 
   int getSensorIndex(String byte0) {
@@ -135,14 +166,14 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
 
     if (returnData.length == 80) {
       final List<int> message = allSensorDataBig(returnData);
-      double msNew = message.last.toDouble();
+      double msNew = message.first.toDouble();
       int hzInt = (100 / max(msNew - msOld, 1.0)).ceil();
       trace.add(hzInt);
       int sum = trace.fold(0, (p, c) => p + c);
       int avHz = (sum / trace.length).ceil().toInt();
       hz = avHz.toString();
       msOld = msNew;
-      myExo.update(message);
+      myHand.update(message);
       if (gameSwitch == 1) {
         if (myExoGame.update(myExo)) {
           await _writeText(myChars[0], context, 'Stop');
@@ -240,11 +271,10 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
             // save the recieved file
             if (myExo.degAarr.isNotEmpty) {
               String fileName = await getPossibleMeasurementName(name);
-              print(fileName);
               String lastPart = fileName.split('/').last;
               lastPart = lastPart.split('.').first;
               AlertDialog myDialog = AlertDialog(
-                title: const Text('Messung Speichern?'),
+                title: const Text('Save Measurement?'),
                 content: TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Gib den Namen der Messung an',
@@ -291,7 +321,7 @@ class _ExoZentralScreenState extends State<ExoZentralScreen> {
 
   Widget gameSwitchScreen() {
     if (gameSwitch == 0) {
-      return ExoView(myExo: myExo);
+      return ExoViewHand(myExo: myHand);
     }
     if (gameSwitch == 1) {
       return ExoGameView(myExoGame: myExoGame);

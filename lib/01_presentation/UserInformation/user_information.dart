@@ -10,14 +10,14 @@ class UserInformation extends StatefulWidget {
   final String name;
 
   @override
-  _UserInformationState createState() => _UserInformationState(name);
+  UserInformationState createState() => UserInformationState(name);
 }
 
-class _UserInformationState extends State<UserInformation> {
+class UserInformationState extends State<UserInformation> {
   final String name;
   bool isLoading = true;
 
-  _UserInformationState(this.name);
+  UserInformationState(this.name);
   late User _myUser;
 
   @override

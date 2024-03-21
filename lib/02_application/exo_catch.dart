@@ -113,9 +113,6 @@ class ExoskeletonCatch {
         double distExo = sqrt(
             pow(xCreate - myExo.pFS[0], 2) + pow(yCreate - myExo.pFS[1], 2));
         if (distExo > distMin) {
-          print(myExo.pFS);
-          print(xCreate);
-          print(yCreate);
           return [xCreate, yCreate];
         } else {
           distMin -= 1;
@@ -150,7 +147,6 @@ class FriendBubbles {
     double hitCircleLife = 0;
 
     if (curLen > 0) {
-      print(myCircles[0].posX);
       for (var i = 0; i < curLen; i++) {
         if (myCircles[i].update(avatarX, avatarY, avatarRadius)) {
           hitCircleLife = myCircles[i].opacityLife;

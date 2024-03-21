@@ -16,11 +16,11 @@ class MeasurementDetailPage extends StatefulWidget {
   final String name;
 
   @override
-  _MeasurementDetailPageState createState() =>
-      _MeasurementDetailPageState(readFileName, name);
+  MeasurementDetailPageState createState() =>
+      MeasurementDetailPageState(readFileName, name);
 }
 
-class _MeasurementDetailPageState extends State<MeasurementDetailPage> {
+class MeasurementDetailPageState extends State<MeasurementDetailPage> {
   final String readFileName;
   final String name;
 
@@ -34,7 +34,7 @@ class _MeasurementDetailPageState extends State<MeasurementDetailPage> {
   double time = 0;
   int gameSwitch = 0;
 
-  _MeasurementDetailPageState(this.readFileName, this.name);
+  MeasurementDetailPageState(this.readFileName, this.name);
 
   @override
   initState() {

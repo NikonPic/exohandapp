@@ -153,14 +153,14 @@ class OscillatorSensorScreen extends StatefulWidget {
   });
 
   @override
-  _OscillatorSensorScreenState createState() =>
-      _OscillatorSensorScreenState(myChar, select);
+  OscillatorSensorScreenState createState() =>
+      OscillatorSensorScreenState(myChar, select);
 
   final BluetoothCharacteristic myChar;
   final int select;
 }
 
-class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
+class OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
   final BluetoothCharacteristic myChar;
   final int select;
   final int anzSensor = 5;
@@ -175,7 +175,7 @@ class _OscillatorSensorScreenState extends State<OscillatorSensorScreen> {
   String myLocString = '1';
   DateTime timeStart = DateTime.now();
 
-  _OscillatorSensorScreenState(this.myChar, this.select);
+  OscillatorSensorScreenState(this.myChar, this.select);
 
   // Transform local snapshot to String
   List<String> getCleanString(AsyncSnapshot<List<int>> snapshot) {

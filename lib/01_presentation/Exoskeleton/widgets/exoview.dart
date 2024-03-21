@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:oscilloscope/oscilloscope.dart';
 import '../../../02_application/exoskeleton.dart';
 
@@ -36,6 +37,70 @@ class ExoView extends StatelessWidget {
             myExo: myExo,
             myfonts: myfonts,
           )
+        ],
+      ),
+    );
+  }
+}
+
+class ExoViewHand extends StatelessWidget {
+  const ExoViewHand({
+    super.key,
+    required this.myExo,
+  });
+
+  final ExoHand myExo;
+  final double yAxisRange = 200;
+  final double mystroke = 2;
+  final double myfonts = 15;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              AngleInfosExtend(
+                fingerName: 'Index',
+                mystroke: mystroke,
+                yAxisRange: yAxisRange,
+                myFinger: myExo.indexData,
+                myfonts: myfonts,
+              ),
+              AngleInfosExtend(
+                fingerName: 'Middle',
+                mystroke: mystroke,
+                yAxisRange: yAxisRange,
+                myFinger: myExo.middleData,
+                myfonts: myfonts,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              AngleInfosExtend(
+                fingerName: 'Ring',
+                mystroke: mystroke,
+                yAxisRange: yAxisRange,
+                myFinger: myExo.ringData,
+                myfonts: myfonts,
+              ),
+              AngleInfosExtend(
+                fingerName: 'Small',
+                mystroke: mystroke,
+                yAxisRange: yAxisRange,
+                myFinger: myExo.smallData,
+                myfonts: myfonts,
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -239,6 +304,157 @@ class AngleInfos extends StatelessWidget {
               const SizedBox(
                 width: 10,
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AngleInfosExtend extends StatelessWidget {
+  const AngleInfosExtend({
+    super.key,
+    required this.fingerName,
+    required this.mystroke,
+    required this.yAxisRange,
+    required this.myFinger,
+    required this.myfonts,
+  });
+
+  final String fingerName;
+  final double mystroke;
+  final double yAxisRange;
+  final FingerData myFinger;
+  final double myfonts;
+
+  @override
+  Widget build(BuildContext context) {
+    final double yAxisMax = yAxisRange;
+    final double yAxisMin = -yAxisRange;
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
+      height: 200,
+      width: size.width * 0.45,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              const Spacer(),
+              Text(
+                fingerName,
+                style: const TextStyle(fontWeight: FontWeight.w200),
+              ),
+            ],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: const Color.fromARGB(255, 252, 189, 1),
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myFinger.angleNArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.angleNArr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.blue,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myFinger.angleBArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.angleBArr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.red,
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myFinger.angleAArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.angleAArr = [],
+            showYAxis: true,
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: const Color.fromARGB(255, 13, 59, 15),
+            yAxisMax: yAxisRange,
+            yAxisMin: -yAxisRange,
+            dataSet: myFinger.angleKArr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.angleKArr = [],
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              Column(
+                children: [
+                  const SizedBox(height: 5),
+                  Text(
+                    '${yAxisMax.toInt()} [°]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${yAxisMin.toInt()} [°]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              Column(
+                children: [
+                  Text(
+                    'N: ${myFinger.angleN} °',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w200,
+                      fontSize: myfonts,
+                      color: const Color.fromARGB(255, 153, 116, 6),
+                    ),
+                  ),
+                  Text(
+                    'B: ${myFinger.angleB} °',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: myfonts,
+                        color: Colors.blue),
+                  ),
+                  Text(
+                    'A: ${myFinger.angleA} °',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: myfonts,
+                        color: Colors.red),
+                  ),
+                  Text(
+                    'K: ${myFinger.angleK} °',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w200,
+                      fontSize: myfonts,
+                      color: const Color.fromARGB(255, 13, 59, 15),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 70,
+              )
             ],
           ),
         ],

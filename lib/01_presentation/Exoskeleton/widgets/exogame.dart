@@ -8,13 +8,13 @@ class ExoGameView extends StatefulWidget {
   final ExoskeletonGame myExoGame;
 
   @override
-  _ExoGameViewState createState() => _ExoGameViewState(myExoGame);
+  ExoGameViewState createState() => ExoGameViewState(myExoGame);
 }
 
-class _ExoGameViewState extends State<ExoGameView> {
+class ExoGameViewState extends State<ExoGameView> {
   final ExoskeletonGame myExoGame;
 
-  _ExoGameViewState(this.myExoGame);
+  ExoGameViewState(this.myExoGame);
 
   @override
   Widget build(BuildContext context) {

@@ -45,6 +45,74 @@ List<double> getPoint(
   return pInter;
 }
 
+class FingerData {
+  final double timeFilter = 0.5;
+
+  int angleN = 0;
+  int angleB = 0;
+  int angleA = 0;
+  int angleK = 0;
+  int force = 0;
+
+  List<int> angleNArr = [];
+  List<int> angleBArr = [];
+  List<int> angleAArr = [];
+  List<int> angleKArr = [];
+  List<int> forceArr = [];
+
+  void update(List<int> intSubMessage) {
+    angleN =
+        (timeFilter * angleN + (1 - timeFilter) * intSubMessage[0]).toInt();
+    angleB =
+        (timeFilter * angleB + (1 - timeFilter) * intSubMessage[1]).toInt();
+    angleA =
+        (timeFilter * angleA + (1 - timeFilter) * intSubMessage[2]).toInt();
+    angleK =
+        (timeFilter * angleK + (1 - timeFilter) * intSubMessage[3]).toInt();
+
+    addRawArrs();
+  }
+
+  void addRawArrs() {
+    // Add angles for finger
+    angleNArr.add(angleN);
+    angleBArr.add(angleB);
+    angleAArr.add(angleA);
+    angleKArr.add(angleK);
+
+    // Add force values for each finger
+    forceArr.add(force);
+  }
+}
+
+class ExoHand {
+  final double timeFilter = 0.5;
+
+  int ms = 0;
+  List<int> message = [];
+  List<int> timeArr = [];
+  FingerData indexData = FingerData();
+  FingerData middleData = FingerData();
+  FingerData ringData = FingerData();
+  FingerData smallData = FingerData();
+
+  void update(List<int> intMessage) {
+    message = intMessage;
+    // assign message
+    ms = intMessage[0];
+    indexData.update([...intMessage.sublist(1, 5), (intMessage[17])]);
+    middleData.update([...intMessage.sublist(5, 9), (intMessage[18])]);
+    ringData.update([...intMessage.sublist(9, 13), (intMessage[19])]);
+    smallData.update([...intMessage.sublist(13, 17), (intMessage[20])]);
+    addRawArrs();
+  }
+
+  void addRawArrs() {
+    // Add current time
+    timeArr.add(ms);
+  }
+}
+
 /// The Exoskeleton Sensors
 class Exoskeleton {
   final double timeFilter = 0.5;
@@ -307,17 +375,17 @@ class ExoskeletonAdv extends Exoskeleton {
   }
 
   Future setParamsFromUser(String name) async {
-    User _myUser = await UserDatabase.instance.readOrCreateUserByNickName(name);
-    lPp = _myUser.lPp;
-    lPm = _myUser.lPm;
-    lPd = _myUser.lPd;
+    User myUser = await UserDatabase.instance.readOrCreateUserByNickName(name);
+    lPp = myUser.lPp;
+    lPm = myUser.lPm;
+    lPd = myUser.lPd;
 
-    hPp = _myUser.hPp;
-    hPm = _myUser.hPm;
-    hPd = _myUser.hPd;
+    hPp = myUser.hPp;
+    hPm = myUser.hPm;
+    hPd = myUser.hPd;
 
-    pA = [_myUser.offAx, _myUser.offAy];
-    calculateConstParams(dGen: _myUser.dGen);
+    pA = [myUser.offAx, myUser.offAy];
+    calculateConstParams(dGen: myUser.dGen);
   }
 
   ///update the radius of the FS

@@ -19,11 +19,11 @@ class ExoFullView extends StatefulWidget {
   final bool measurementMode;
 
   @override
-  _ExoFullViewState createState() =>
-      _ExoFullViewState(myExo, name, myExoGame, measurementMode);
+  ExoFullViewState createState() =>
+      ExoFullViewState(myExo, name, myExoGame, measurementMode);
 }
 
-class _ExoFullViewState extends State<ExoFullView> {
+class ExoFullViewState extends State<ExoFullView> {
   final ExoskeletonCatch myExoGame;
   final ExoskeletonAdv myExo;
   final String name;
@@ -35,8 +35,7 @@ class _ExoFullViewState extends State<ExoFullView> {
     super.initState();
   }
 
-  _ExoFullViewState(
-      this.myExo, this.name, this.myExoGame, this.measurementMode);
+  ExoFullViewState(this.myExo, this.name, this.myExoGame, this.measurementMode);
 
   @override
   Widget build(BuildContext context) {
