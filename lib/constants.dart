@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // Colors used in our app
-const kPrimaryColor = Color(0xFF0C6698);
-const kSecondaryColor = Colors.blueGrey;
+const kPrimaryColor = Color.fromARGB(255, 119, 173, 202);
+const kSecondaryColor = Color.fromARGB(255, 188, 148, 221);
 const kTextColor = Color(0xFF3C4046);
 const kBackgroundColor = Color(0xF2F9F2FA);
 

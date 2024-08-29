@@ -75,7 +75,7 @@ class ExoScreen extends StatelessWidget {
         const SizedBox(
           width: 20,
         ),
-        const Text('Exoskelett'),
+        const Text('Exoskeleton'),
         const Spacer(),
       ]),
       actions: <Widget>[
@@ -88,7 +88,7 @@ class ExoScreen extends StatelessWidget {
             switch (snapshot.data) {
               case BluetoothConnectionState.connected:
                 onPressed = () => myDevice.disconnect();
-                text = 'Verbunden';
+                text = 'Connected';
                 myIcon = const Icon(
                   Icons.bluetooth_connected,
                   color: Colors.green,
@@ -97,7 +97,7 @@ class ExoScreen extends StatelessWidget {
               case BluetoothConnectionState.disconnected:
                 onPressed = () =>
                     myDevice.connect().timeout(const Duration(seconds: 4));
-                text = 'Nicht verbunden';
+                text = 'Disconnected';
                 myIcon = const Icon(
                   Icons.bluetooth_disabled,
                   color: Colors.red,

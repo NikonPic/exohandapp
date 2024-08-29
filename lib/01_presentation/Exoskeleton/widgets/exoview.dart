@@ -5,51 +5,50 @@ import '../../../02_application/exoskeleton.dart';
 class ExoView extends StatelessWidget {
   const ExoView({
     super.key,
-    required this.myExo,
+    required this.myExoList,
   });
 
-  final ExoskeletonAdv myExo;
+  final List<ExoskeletonAdv> myExoList;
   final double yAxisRange = 200;
   final double mystroke = 2;
   final double myfonts = 15;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          AngleInfos(
-              mystroke: mystroke,
-              yAxisRange: yAxisRange,
-              myExo: myExo,
-              myfonts: myfonts),
-          const SizedBox(height: 10),
-          TorqueInfos(
-              mystroke: mystroke,
-              yAxisRange: 0.25,
-              myExo: myExo,
-              myfonts: myfonts),
-          const SizedBox(height: 10),
-          ForceView(
+    return Column(
+      children: [
+        AngleInfos(
             mystroke: mystroke,
-            myExo: myExo,
-            myfonts: myfonts,
-          )
-        ],
-      ),
+            yAxisRange: yAxisRange,
+            myExo: myExoList[0],
+            myfonts: myfonts),
+        const SizedBox(height: 10),
+        TorqueInfos(
+            mystroke: mystroke,
+            yAxisRange: 0.25,
+            myExo: myExoList[0],
+            myfonts: myfonts),
+        const SizedBox(height: 10),
+        ForceView(
+          mystroke: mystroke,
+          myExo: myExoList[0],
+          myfonts: myfonts,
+        )
+      ],
     );
   }
 }
 
 class ExoViewHand extends StatelessWidget {
-  const ExoViewHand({
+  ExoViewHand({
     super.key,
-    required this.myExo,
+    required this.myExoHand,
+    required this.myExoList,
   });
 
-  final ExoHand myExo;
-  final double yAxisRange = 200;
+  final ExoHand myExoHand;
+  final List<ExoskeletonAdv> myExoList;
+  final List<double> yAxisRange = [-40, 220];
   final double mystroke = 2;
   final double myfonts = 15;
 
@@ -60,20 +59,20 @@ class ExoViewHand extends StatelessWidget {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AngleInfosExtend(
+              AngleInfosFinger(
                 fingerName: 'Index',
                 mystroke: mystroke,
                 yAxisRange: yAxisRange,
-                myFinger: myExo.indexData,
+                myFinger: myExoList[0],
                 myfonts: myfonts,
               ),
-              AngleInfosExtend(
+              AngleInfosFinger(
                 fingerName: 'Middle',
                 mystroke: mystroke,
                 yAxisRange: yAxisRange,
-                myFinger: myExo.middleData,
+                myFinger: myExoList[1],
                 myfonts: myfonts,
               ),
             ],
@@ -82,20 +81,20 @@ class ExoViewHand extends StatelessWidget {
             height: 10,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AngleInfosExtend(
+              AngleInfosFinger(
                 fingerName: 'Ring',
                 mystroke: mystroke,
                 yAxisRange: yAxisRange,
-                myFinger: myExo.ringData,
+                myFinger: myExoList[2],
                 myfonts: myfonts,
               ),
-              AngleInfosExtend(
+              AngleInfosFinger(
                 fingerName: 'Small',
                 mystroke: mystroke,
                 yAxisRange: yAxisRange,
-                myFinger: myExo.smallData,
+                myFinger: myExoList[3],
                 myfonts: myfonts,
               ),
             ],
@@ -104,9 +103,10 @@ class ExoViewHand extends StatelessWidget {
             height: 10,
           ),
           ForceInfos(
+              myExoList: myExoList,
               mystroke: mystroke,
-              yAxisRange: 500,
-              myExo: myExo,
+              yAxisRange: const [-5, 10],
+              myExo: myExoHand,
               myfonts: myfonts)
         ],
       ),
@@ -343,8 +343,8 @@ class AngleInfosExtend extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
-      height: 200,
-      width: size.width * 0.45,
+      height: 150,
+      width: size.width * 0.49,
       child: Stack(
         children: [
           Column(
@@ -602,47 +602,49 @@ class ForceInfos extends StatelessWidget {
     required this.yAxisRange,
     required this.myExo,
     required this.myfonts,
+    required this.myExoList,
   });
 
   final double mystroke;
-  final double yAxisRange;
+  final List<double> yAxisRange;
   final ExoHand myExo;
+  final List<ExoskeletonAdv> myExoList;
   final double myfonts;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Container(
-      width: size.width * 0.9,
+      width: size.width,
       decoration: BoxDecoration(
           color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
-      height: 200,
+      height: 150,
       child: Stack(
         children: [
           Oscilloscope(
             strokeWidth: mystroke,
             traceColor: Colors.amber,
-            yAxisMax: yAxisRange,
-            yAxisMin: -yAxisRange,
-            dataSet: myExo.indexData.forceArr,
+            yAxisMax: yAxisRange[1],
+            yAxisMin: yAxisRange[0],
+            dataSet: myExoList[0].forceArr,
             backgroundColor: Colors.black.withOpacity(0),
             onNewViewport: () => myExo.indexData.forceArr = [],
           ),
           Oscilloscope(
             strokeWidth: mystroke,
             traceColor: Colors.blue,
-            yAxisMax: yAxisRange,
-            yAxisMin: -yAxisRange,
-            dataSet: myExo.middleData.forceArr,
+            yAxisMax: yAxisRange[1],
+            yAxisMin: yAxisRange[0],
+            dataSet: myExoList[1].forceArr,
             backgroundColor: Colors.black.withOpacity(0),
             onNewViewport: () => myExo.middleData.forceArr = [],
           ),
           Oscilloscope(
             strokeWidth: mystroke,
             traceColor: Colors.red,
-            yAxisMax: yAxisRange,
-            yAxisMin: -yAxisRange,
-            dataSet: myExo.ringData.forceArr,
+            yAxisMax: yAxisRange[1],
+            yAxisMin: yAxisRange[0],
+            dataSet: myExoList[2].forceArr,
             backgroundColor: Colors.black.withOpacity(0),
             onNewViewport: () => myExo.ringData.forceArr = [],
             showYAxis: true,
@@ -650,9 +652,9 @@ class ForceInfos extends StatelessWidget {
           Oscilloscope(
             strokeWidth: mystroke,
             traceColor: Colors.purple,
-            yAxisMax: yAxisRange,
-            yAxisMin: -yAxisRange,
-            dataSet: myExo.smallData.forceArr,
+            yAxisMax: yAxisRange[1],
+            yAxisMin: yAxisRange[0],
+            dataSet: myExoList[3].forceArr,
             backgroundColor: Colors.black.withOpacity(0),
             onNewViewport: () => myExo.smallData.forceArr = [],
             showYAxis: true,
@@ -669,7 +671,7 @@ class ForceInfos extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
                   Text(
-                    'index: ${myExo.indexData.force} N',
+                    'index: ${myExoList[0].force.toStringAsFixed(3)} N',
                     style: TextStyle(
                       fontWeight: FontWeight.w300,
                       fontSize: myfonts,
@@ -677,21 +679,21 @@ class ForceInfos extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'middle: ${myExo.middleData.force} N',
+                    'middle: ${myExoList[1].force.toStringAsFixed(3)} N',
                     style: TextStyle(
                         fontWeight: FontWeight.w300,
                         fontSize: myfonts,
                         color: Colors.blue),
                   ),
                   Text(
-                    'ring: ${myExo.ringData.force} N',
+                    'ring: ${myExoList[2].force.toStringAsFixed(3)} N',
                     style: TextStyle(
                         fontWeight: FontWeight.w300,
                         fontSize: myfonts,
                         color: Colors.red),
                   ),
                   Text(
-                    'small: ${myExo.smallData.force} N',
+                    'small: ${myExoList[3].force.toStringAsFixed(3)} N',
                     style: TextStyle(
                         fontWeight: FontWeight.w300,
                         fontSize: myfonts,
@@ -704,7 +706,7 @@ class ForceInfos extends StatelessWidget {
                 children: [
                   const SizedBox(height: 5),
                   Text(
-                    '$yAxisRange [N]',
+                    '${yAxisRange[1]} [N]',
                     style: TextStyle(
                         color: Colors.grey,
                         fontSize: myfonts,
@@ -712,7 +714,7 @@ class ForceInfos extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '${-yAxisRange} [N]',
+                    '${yAxisRange[0]} [N]',
                     style: TextStyle(
                         color: Colors.grey,
                         fontSize: myfonts,
@@ -724,6 +726,140 @@ class ForceInfos extends StatelessWidget {
               const SizedBox(
                 width: 10,
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AngleInfosFinger extends StatelessWidget {
+  const AngleInfosFinger({
+    super.key,
+    required this.fingerName,
+    required this.mystroke,
+    required this.yAxisRange,
+    required this.myFinger,
+    required this.myfonts,
+  });
+
+  final String fingerName;
+  final double mystroke;
+  final List<double> yAxisRange;
+  final ExoskeletonAdv myFinger;
+  final double myfonts;
+
+  @override
+  Widget build(BuildContext context) {
+    final double yAxisMax = yAxisRange[1];
+    final double yAxisMin = yAxisRange[0];
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)),
+      height: 150,
+      width: size.width * 0.49,
+      child: Stack(
+        children: [
+          Column(
+            children: [
+              const Spacer(),
+              Text(
+                fingerName,
+                style: const TextStyle(fontWeight: FontWeight.w200),
+              ),
+            ],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: const Color.fromARGB(255, 252, 189, 1),
+            yAxisMax: yAxisMax,
+            yAxisMin: yAxisMin,
+            dataSet: myFinger.degBarr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.degBarr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.blue,
+            yAxisMax: yAxisMax,
+            yAxisMin: yAxisMin,
+            dataSet: myFinger.degAarr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.degAarr = [],
+          ),
+          Oscilloscope(
+            strokeWidth: mystroke,
+            traceColor: Colors.red,
+            yAxisMax: yAxisMax,
+            yAxisMin: yAxisMin,
+            dataSet: myFinger.degKarr,
+            backgroundColor: Colors.black.withOpacity(0),
+            onNewViewport: () => myFinger.degKarr = [],
+            showYAxis: true,
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              Column(
+                children: [
+                  const SizedBox(height: 5),
+                  Text(
+                    '${yAxisMax.toInt()} [°]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${yAxisMin.toInt()} [°]',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: myfonts,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Spacer(),
+              Column(
+                children: [
+                  Text(
+                    'MCP: ${myFinger.phiMCP.toInt().abs()} °',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w200,
+                      fontSize: myfonts,
+                      color: const Color.fromARGB(255, 153, 116, 6),
+                    ),
+                  ),
+                  Text(
+                    'PIP: ${myFinger.phiPIP.toInt().abs()} °',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: myfonts,
+                        color: Colors.blue),
+                  ),
+                  Text(
+                    'DIP: ${myFinger.phiDIP.toInt().abs()} °',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w200,
+                        fontSize: myfonts,
+                        color: Colors.red),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 70,
+              )
             ],
           ),
         ],

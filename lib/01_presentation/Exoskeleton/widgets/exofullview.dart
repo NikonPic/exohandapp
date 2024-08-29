@@ -8,24 +8,24 @@ import '../../../constants.dart';
 class ExoFullView extends StatefulWidget {
   const ExoFullView(
       {super.key,
-      required this.myExo,
+      required this.myExoList,
       required this.name,
       required this.myExoGame,
       required this.measurementMode});
 
-  final ExoskeletonAdv myExo;
+  final List<ExoskeletonAdv> myExoList;
   final String name;
   final ExoskeletonCatch myExoGame;
   final bool measurementMode;
 
   @override
   ExoFullViewState createState() =>
-      ExoFullViewState(myExo, name, myExoGame, measurementMode);
+      ExoFullViewState(myExoList, name, myExoGame, measurementMode);
 }
 
 class ExoFullViewState extends State<ExoFullView> {
   final ExoskeletonCatch myExoGame;
-  final ExoskeletonAdv myExo;
+  final List<ExoskeletonAdv> myExoList;
   final String name;
   final bool measurementMode;
   bool isLoading = true;
@@ -35,11 +35,15 @@ class ExoFullViewState extends State<ExoFullView> {
     super.initState();
   }
 
-  ExoFullViewState(this.myExo, this.name, this.myExoGame, this.measurementMode);
+  ExoFullViewState(
+      this.myExoList, this.name, this.myExoGame, this.measurementMode);
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    //Size size = MediaQuery.of(context).size;
+    Size size = const Size(500, 100);
+    double width = 400;
+    double height = 500;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -49,8 +53,82 @@ class ExoFullViewState extends State<ExoFullView> {
         height: 500,
         child: Stack(
           children: [
-            CustomPaint(
-              foregroundPainter: ExoPainter(myExo, size),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: width,
+                        maxHeight: height,
+                        minHeight: height,
+                        minWidth: width,
+                      ),
+                      child: CustomPaint(
+                        size: Size(width, height),
+                        painter:
+                            ExoPainter(myExoList[0], Size(width, 0.5 * height)),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: width,
+                        maxHeight: height,
+                        minHeight: height,
+                        minWidth: width,
+                      ),
+                      child: CustomPaint(
+                        size: Size(width, height),
+                        painter:
+                            ExoPainter(myExoList[1], Size(width, 0.5 * height)),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: width,
+                        maxHeight: height,
+                        minHeight: height,
+                        minWidth: width,
+                      ),
+                      child: CustomPaint(
+                        size: Size(width, height),
+                        painter:
+                            ExoPainter(myExoList[2], Size(width, 0.5 * height)),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: width,
+                        maxHeight: height,
+                        minHeight: height,
+                        minWidth: width,
+                      ),
+                      child: CustomPaint(
+                        size: Size(width, height),
+                        painter:
+                            ExoPainter(myExoList[3], Size(width, 0.5 * height)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             myExoGame.play
                 ? Stack(
@@ -63,7 +141,7 @@ class ExoFullViewState extends State<ExoFullView> {
                   )
                 : const Column(),
             MyParamsSetter(
-              myExo: myExo,
+              myExo: myExoList[0],
               myExoCatch: myExoGame,
               measurementMode: measurementMode,
             )
@@ -262,6 +340,7 @@ class CatchPainter extends CustomPainter {
 class ExoPainter extends CustomPainter {
   final Size screenSize;
   final ExoskeletonAdv myExo;
+
   ExoPainter(this.myExo, this.screenSize);
   final double offx = 2;
   final double offy = 3;

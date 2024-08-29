@@ -34,12 +34,12 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
   initState() {
     super.initState();
     refreshUser();
-    myExoCatch.setConstParams(myExo);
+    myExoCatch.setConstParams(myExoList[0]);
     myChars[1].setNotifyValue(true);
   }
 
   Future refreshUser() async {
-    await myExo.setParamsFromUser(name);
+    await myExoList[0].setParamsFromUser(name);
     setState(() {
       isLoading = false;
     });
@@ -52,7 +52,32 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
   List<int> trace = [];
   String myLocString = '1';
   DateTime timeStart = DateTime.now();
-  ExoskeletonAdv myExo = ExoskeletonAdv();
+  List<ExoskeletonAdv> myExoList = [
+    ExoskeletonAdv(
+        offB: -65,
+        offA: -70,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -3), // index
+    ExoskeletonAdv(
+        offB: -70,
+        offA: -60,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -1.3), // midlle
+    ExoskeletonAdv(
+        offB: -40,
+        offA: -90,
+        offK: 20,
+        scaleForce: 0.01,
+        offForceA: -1.55), // ring
+    ExoskeletonAdv(
+        offB: -60,
+        offA: -60,
+        offK: 20,
+        scaleForce: 0.007,
+        offForceA: -2), // small
+  ];
   ExoHand myHand = ExoHand();
   ExoskeletonGame myExoGame = ExoskeletonGame();
   ExoskeletonCatch myExoCatch = ExoskeletonCatch();
@@ -83,25 +108,29 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
 
   List<int> allSensorDataBig(List<String> returnData) {
     // index finger
-    int angleNI = getSensorData(returnData[0], returnData[1]);
-    int angleBI = getSensorData(returnData[2], returnData[3]);
-    int angleAI = getSensorData(returnData[4], returnData[5]);
-    int angleKI = getSensorData(returnData[6], returnData[7]);
+    int angleAI = getSensorData(returnData[0], returnData[1]);
+    int angleKI = getSensorData(returnData[2], returnData[3]);
+    int angleNI = getSensorData(returnData[4], returnData[5]);
+    int angleBI = getSensorData(returnData[6], returnData[7]);
+
     // middle finger
-    int angleNM = getSensorData(returnData[8], returnData[9]);
-    int angleBM = getSensorData(returnData[10], returnData[11]);
-    int angleAM = getSensorData(returnData[12], returnData[13]);
-    int angleKM = getSensorData(returnData[14], returnData[15]);
+    int angleBM = getSensorData(returnData[8], returnData[9]);
+    int angleAM = getSensorData(returnData[10], returnData[11]);
+    int angleKM = getSensorData(returnData[12], returnData[13]);
+    int angleNM = getSensorData(returnData[14], returnData[15]);
+
     // ring finger
-    int angleNR = getSensorData(returnData[16], returnData[17]);
+    int angleAR = getSensorData(returnData[16], returnData[17]);
     int angleBR = getSensorData(returnData[18], returnData[19]);
-    int angleAR = getSensorData(returnData[20], returnData[21]);
-    int angleKR = getSensorData(returnData[22], returnData[23]);
+    int angleKR = getSensorData(returnData[20], returnData[21]);
+    int angleNR = getSensorData(returnData[22], returnData[23]);
+
     // small finger
-    int angleNS = getSensorData(returnData[24], returnData[25]);
-    int angleBS = getSensorData(returnData[26], returnData[27]);
-    int angleAS = getSensorData(returnData[28], returnData[29]);
-    int angleKS = getSensorData(returnData[30], returnData[31]);
+    int angleBS = getSensorData(returnData[24], returnData[25]);
+    int angleAS = getSensorData(returnData[26], returnData[27]);
+    int angleKS = getSensorData(returnData[28], returnData[29]);
+    int angleNS = getSensorData(returnData[30], returnData[31]);
+
     //forces
     int forceI = getSensorData(returnData[32], returnData[33]);
     int forceM = getSensorData(returnData[34], returnData[35]);
@@ -111,10 +140,10 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
     int cs = getSensorData(returnData[40], returnData[41]);
     return [
       cs,
-      angleNI,
       angleBI,
       angleAI,
       angleKI,
+      angleNI,
       angleNM,
       angleBM,
       angleAM,
@@ -174,13 +203,19 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
       hz = avHz.toString();
       msOld = msNew;
       myHand.update(message);
+
+      myExoList[0].update(myHand.indexData.toMessage());
+      myExoList[1].update(myHand.middleData.toMessage());
+      myExoList[2].update(myHand.ringData.toMessage());
+      myExoList[3].update(myHand.smallData.toMessage());
+
       if (gameSwitch == 1) {
-        if (myExoGame.update(myExo)) {
+        if (myExoGame.update(myExoList[0])) {
           await _writeText(myChars[0], context, 'Stop');
         }
       }
       if (gameSwitch == 2) {
-        myExoCatch.update(myExo);
+        myExoCatch.update(myExoList[0]);
       }
     }
   }
@@ -255,21 +290,21 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
           myFunc: () async {
             await _writeText(myChars[0], context, 'Start');
           },
-          text: 'Messen + Motor',
+          text: 'Measure + Motor',
         ),
         const Spacer(),
         MyStyleButton(
           myFunc: () async {
             await _writeText(myChars[0], context, 'Game');
           },
-          text: 'Messen',
+          text: 'Measure',
         ),
         const Spacer(),
         MyStyleButton(
           myFunc: () async {
             await _writeText(myChars[0], context, 'Stop');
             // save the recieved file
-            if (myExo.degAarr.isNotEmpty) {
+            if (myExoList[0].degAarr.isNotEmpty) {
               String fileName = await getPossibleMeasurementName(name);
               String lastPart = fileName.split('/').last;
               lastPart = lastPart.split('.').first;
@@ -288,7 +323,7 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      await myExo.save(fileName);
+                      await save(fileName);
                       Navigator.pop(context, true);
                       SnackBar snackBar = SnackBar(
                         content: Text('Gespeichert unter $fileName'),
@@ -319,15 +354,60 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
     );
   }
 
+  Future save(String fileName) async {
+    // Ensure the file name ends with .json
+    if (!fileName.endsWith('.json')) {
+      fileName = '$fileName.json';
+    }
+
+    final fingerNames = ['index', 'middle', 'ring', 'small'];
+    Map<String, Map<String, List<dynamic>>> exoDataMap = {};
+
+    for (int i = 0; i < myExoList.length; i++) {
+      exoDataMap[fingerNames[i]] = {
+        'time': replaceNaNs(myHand.timeArr),
+        'MCP': replaceNaNs(myExoList[i].degBarr),
+        'PIP': replaceNaNs(myExoList[i].degAarr),
+        'DIP': replaceNaNs(myExoList[i].degKarr),
+        'force': replaceNaNs(myExoList[i].forceArr),
+        'mMcpNm': replaceNaNs(myExoList[i].mMcpNmArr),
+        'mPipNm': replaceNaNs(myExoList[i].mPipNmArr),
+        'mDipNm': replaceNaNs(myExoList[i].mDipNmArr),
+      };
+    }
+
+    String saveString = jsonEncode(exoDataMap);
+
+    await writeContent(fileName, saveString);
+  }
+
+  List<num> replaceNaNs(List<num> arr, {num defaultValue = 0}) {
+    num? lastValidValue;
+
+    for (int i = 0; i < arr.length; i++) {
+      if (arr[i] is double && (arr[i] as double).isNaN) {
+        if (lastValidValue != null) {
+          arr[i] = lastValidValue;
+        } else {
+          arr[i] = defaultValue is int ? defaultValue.toDouble() : defaultValue;
+        }
+      } else {
+        lastValidValue = arr[i];
+      }
+    }
+
+    return arr;
+  }
+
   Widget gameSwitchScreen() {
     if (gameSwitch == 0) {
-      return ExoViewHand(myExo: myHand);
+      return ExoViewHand(myExoHand: myHand, myExoList: myExoList);
     }
     if (gameSwitch == 1) {
       return ExoGameView(myExoGame: myExoGame);
     }
     return ExoFullView(
-      myExo: myExo,
+      myExoList: myExoList,
       name: name,
       myExoGame: myExoCatch,
       measurementMode: false,

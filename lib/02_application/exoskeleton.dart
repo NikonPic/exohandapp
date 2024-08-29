@@ -53,6 +53,7 @@ class FingerData {
   int angleA = 0;
   int angleK = 0;
   int force = 0;
+  int ms = 0;
 
   List<int> angleNArr = [];
   List<int> angleBArr = [];
@@ -61,18 +62,20 @@ class FingerData {
   List<int> forceArr = [];
 
   void update(List<int> intSubMessage) {
-    angleN =
-        (timeFilter * angleN + (1 - timeFilter) * intSubMessage[0]).toInt();
-    angleB =
-        (timeFilter * angleB + (1 - timeFilter) * intSubMessage[1]).toInt();
-    angleA =
-        (timeFilter * angleA + (1 - timeFilter) * intSubMessage[2]).toInt();
-    angleK =
-        (timeFilter * angleK + (1 - timeFilter) * intSubMessage[3]).toInt();
-
-    force = (timeFilter * force + (1 - timeFilter) * intSubMessage[4]).toInt();
-
+    ms = angleN = _filteredUpdate(angleN, intSubMessage[0]);
+    angleB = _filteredUpdate(angleB, intSubMessage[1]);
+    angleA = _filteredUpdate(angleA, intSubMessage[2]);
+    angleK = _filteredUpdate(angleK, intSubMessage[3]);
+    force = _filteredUpdate(force, intSubMessage[4]);
     addRawArrs();
+  }
+
+  int _filteredUpdate(int currentValue, int newValue) {
+    return (timeFilter * currentValue + (1 - timeFilter) * newValue).toInt();
+  }
+
+  List<int> toMessage() {
+    return [ms, angleB, angleA, angleK, force, 0];
   }
 
   void addRawArrs() {
@@ -143,6 +146,21 @@ class Exoskeleton {
   List<double> degKarr = [];
   List<double> forceArr = [];
 
+  final double offB;
+  final double offA;
+  final double offK;
+
+  final double scaleForce;
+  final double offForceA;
+
+  Exoskeleton({
+    required this.offB,
+    required this.offA,
+    required this.offK,
+    required this.scaleForce,
+    required this.offForceA,
+  });
+
   /// update at each timeStep
   void update(List<int> intMessage) {
     // assign message
@@ -160,13 +178,13 @@ class Exoskeleton {
 
   void calibrate() {
     // perform the calibration on all sensors
-    degB = -9.27963813 + angleB * 0.05338593 - 25;
-    degA = -10.28751994 + angleA * 0.05290898 - 50;
-    degK = -10.36236706 + angleK * 0.05186958;
+    degB = angleB + offB;
+    degA = angleA + offA;
+    degK = angleK + offK;
 
     // perform the calculation for the force
-    double fBack = 0.00477458 * forceA - 6.32508; //Kraftsensor A
-    double fFront = 0.0049497 * forceB - 7.17406; //Kraftsensor B
+    double fBack = scaleForce * forceA - offForceA; //Kraftsensor A
+    double fFront = scaleForce * forceB - 0; //Kraftsensor B
     force = fFront - fBack;
   }
 
@@ -354,7 +372,12 @@ class ExoskeletonAdv extends Exoskeleton {
   List<double> mDipNmArr = [];
 
   /// Initialise all dependent parameters
-  ExoskeletonAdv() {
+  ExoskeletonAdv(
+      {required super.offB,
+      required super.offA,
+      required super.offK,
+      required super.scaleForce,
+      required super.offForceA}) {
     lG1 = sqrt(pow(0 - pA[0], 2) + pow(0 - pA[1], 2));
     psi_2 = acos(-pA[0] / lG1);
     psi_1 = ((180 - 35) / 360) * 2 * pi;
@@ -529,9 +552,9 @@ class ExoskeletonAdv extends Exoskeleton {
     addRawArrs();
 
     // new advanced data
-    degBarr.add(phiMCP);
-    degAarr.add(phiPIP);
-    degKarr.add(phiDIP);
+    degBarr.add(-phiMCP);
+    degAarr.add(-phiPIP);
+    degKarr.add(-phiDIP);
     forceArr.add(force);
   }
 

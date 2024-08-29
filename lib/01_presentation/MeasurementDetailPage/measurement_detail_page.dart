@@ -26,7 +26,32 @@ class MeasurementDetailPageState extends State<MeasurementDetailPage> {
 
   List<String> content = [];
   bool isLoading = true;
-  ExoskeletonAdv myExo = ExoskeletonAdv();
+  List<ExoskeletonAdv> myExoList = [
+    ExoskeletonAdv(
+        offB: -55,
+        offA: -50,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -6.5), // index
+    ExoskeletonAdv(
+        offB: -55,
+        offA: -60,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -6.5), // midlle
+    ExoskeletonAdv(
+        offB: 30,
+        offA: -60,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -6.5), // ring
+    ExoskeletonAdv(
+        offB: -60,
+        offA: -60,
+        offK: 20,
+        scaleForce: 0.005,
+        offForceA: -6.5), // small
+  ];
   ExoskeletonGame myExoGame = ExoskeletonGame();
   ExoskeletonCatch myExoCatch = ExoskeletonCatch();
   int lines = 2;
@@ -43,7 +68,7 @@ class MeasurementDetailPageState extends State<MeasurementDetailPage> {
       (value) {
         content = value;
         lines = content.length;
-        myExo.setParamsFromUser(name).then(
+        myExoList[0].setParamsFromUser(name).then(
               (value) => {
                 setState(
                   () {
@@ -51,14 +76,14 @@ class MeasurementDetailPageState extends State<MeasurementDetailPage> {
                         contentLine2Message(content[curLine]);
                     updateCurTime(curLine);
                     setState(() {
-                      myExo.update(intMessage);
+                      myExoList[0].update(intMessage);
                     });
                     isLoading = false;
                   },
                 )
               },
             );
-        myExoCatch.setConstParams(myExo);
+        myExoCatch.setConstParams(myExoList[0]);
       },
     );
   }
@@ -113,12 +138,12 @@ class MeasurementDetailPageState extends State<MeasurementDetailPage> {
                             contentLine2Message(content[curLine]);
                         updateCurTime(curLine);
                         setState(() {
-                          myExo.update(intMessage);
+                          myExoList[0].update(intMessage);
                           if (gameSwitch == 1) {
-                            myExoGame.update(myExo);
+                            myExoGame.update(myExoList[0]);
                           }
                           if (gameSwitch == 2) {
-                            myExoCatch.update(myExo);
+                            myExoCatch.update(myExoList[0]);
                           }
                         });
                       },
@@ -135,13 +160,13 @@ class MeasurementDetailPageState extends State<MeasurementDetailPage> {
 
   Widget gameSwitchScreen() {
     if (gameSwitch == 0) {
-      return ExoView(myExo: myExo);
+      return ExoView(myExoList: myExoList);
     }
     if (gameSwitch == 1) {
       return ExoGameView(myExoGame: myExoGame);
     }
     return ExoFullView(
-      myExo: myExo,
+      myExoList: myExoList,
       name: name,
       myExoGame: myExoCatch,
       measurementMode: false,

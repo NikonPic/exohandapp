@@ -20,7 +20,7 @@ class FindDevicesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text('Suche nach Bluetoothgeräten')),
+        title: const Center(child: Text('Search for Bluetooth devices')),
         backgroundColor: kPrimaryColor,
       ),
       body: FutureBuilder(
