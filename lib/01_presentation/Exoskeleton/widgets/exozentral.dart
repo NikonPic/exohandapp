@@ -404,14 +404,14 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
       return ExoViewHand(myExoHand: myHand, myExoList: myExoList);
     }
     if (gameSwitch == 1) {
-      return ExoGameView(myExoGame: myExoGame);
+      return ExoFullView(
+        myExoList: myExoList,
+        name: name,
+        myExoGame: myExoCatch,
+        measurementMode: false,
+      );
     }
-    return ExoFullView(
-      myExoList: myExoList,
-      name: name,
-      myExoGame: myExoCatch,
-      measurementMode: false,
-    );
+    return ExoGameView(myExoGame: myExoGame);
   }
 
   ElevatedButton gameSwitchIcon() {
@@ -422,17 +422,17 @@ class ExoZentralScreenState extends State<ExoZentralScreen> {
     Text myLabel = const Text('Measure Mode');
     if (gameSwitch == 1) {
       myIcon = const Icon(
-        Icons.gamepad,
-        size: 15,
-      );
-      myLabel = const Text('Game Mode');
-    }
-    if (gameSwitch == 2) {
-      myIcon = const Icon(
         Icons.panorama_fish_eye,
         size: 15,
       );
       myLabel = const Text('View Mode');
+    }
+    if (gameSwitch == 2) {
+      myIcon = const Icon(
+        Icons.gamepad,
+        size: 15,
+      );
+      myLabel = const Text('Game Mode');
     }
 
     return ElevatedButton.icon(
